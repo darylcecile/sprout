@@ -1,15 +1,29 @@
 # sprout
 
-To install dependencies:
+## Usage
 
-```bash
-bun install
-```
+To use the `sprout` CLI, follow these steps:
 
-To run:
+1. Install the CLI by running:
+	```bash
+	yarn install -g @shrubs/sprout
+	```
 
-```bash
-bun run index.ts
-```
+2. Verify the installation:
+	```bash
+	sprout --version
+	```
 
-This project was created using `bun init` in bun v1.1.38. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+3. When you are ready to pull a config from a remote repository, run:
+	```bash
+	sprout config <repo-name-only> -f <folder>
+	```
+	Replace `<repo-name-only>` with the name of the repository you want to pull from, and `<folder>` with the folder where you want to store the configuration. For example, if you wanted to pull down the `ide/vscode` settings from the `darylcecile` repository, you would run:
+	```bash
+	sprout config darylcecile -f ide/vscode
+	```
+
+4. For additional commands and options, run:
+	```bash
+	sprout --help
+	```

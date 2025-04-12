@@ -3,6 +3,7 @@ import { adapters } from '../constants';
 import type { Manifest } from "../manifest";
 import { type Directory, cloneRepository } from '../remote/clone';
 import { processAdapters } from "../utils/Adapter";
+import { getBrewPath } from "../utils/locations";
 import { logger } from '../utils/log';
 
 type Argv = ArgumentsCamelCase<{
@@ -64,13 +65,16 @@ async function loadDependencies(repo: Directory, manifest: Manifest) {
 
 		if (dependency.check) {
 			stream.log(`Checking dependency: ${dependency.name}`);
-			const out = Bun.spawnSync(['bash', '-c', dependency.check], {
+			const out = Bun.spawnSync(['zsh', '-c', dependency.check], {
 				cwd: repo.getDirectory(),
-				env: process.env
+				env: {
+					...process.env,
+					SHELL: '/bin/zsh'
+				}
 			});
 
 			if (out.exitCode === 0) {
-				stream.log(`Dependency ${dependency.name} is already installed. Skipping.`);
+				stream.end(`Dependency ${dependency.name} is already installed.`);
 				continue;
 			}
 		}
@@ -80,14 +84,18 @@ async function loadDependencies(repo: Directory, manifest: Manifest) {
 
 		switch (dependency.installer) {
 			case 'brew': {
+				const brewLocation = getBrewPath();
 				const cmd = createCommand({
-					command: ['brew', 'install', dependency.name],
+					command: [brewLocation, 'install', dependency.name],
 					sudo: needSudo
 				});
 
 				const proc = Bun.spawn(cmd, {
 					cwd: repo.getDirectory(),
-					env: process.env,
+					env: {
+						...process.env,
+						SHELL: '/bin/zsh'
+					},
 					stdout: 'pipe',
 					stderr: 'pipe',
 					stdin: needInteractive ? 'inherit' : 'ignore'
@@ -111,7 +119,7 @@ async function loadDependencies(repo: Directory, manifest: Manifest) {
 				}
 
 				const cmd = createCommand({
-					command: ['bash', '-c', dependency.command],
+					command: ['zsh', '-c', dependency.command],
 					sudo: needSudo
 				});
 
@@ -149,7 +157,7 @@ async function runCleanupScripts(repo: Directory, manifest: Manifest) {
 
 		stream.log(`Running script: ${script.command}`);
 
-		const proc = Bun.spawn(['bash', '-c', script.command], {
+		const proc = Bun.spawn(['zsh', '-c', script.command], {
 			cwd: repo.getDirectory(),
 			env: process.env,
 			stdout: 'pipe',
@@ -178,7 +186,7 @@ async function runSetupScripts(repo: Directory, manifest: Manifest) {
 
 		stream.log(`Running script: ${script.command}`);
 
-		const proc = Bun.spawn(['bash', '-c', script.command], {
+		const proc = Bun.spawn(['zsh', '-c', script.command], {
 			cwd: repo.getDirectory(),
 			env: process.env,
 			stdout: 'pipe',
@@ -211,3 +219,4 @@ function createCommand(options: CommandOptions) {
 
 	return command;
 }
+

@@ -89,7 +89,7 @@ export async function cloneRepository(org: string, repo: string = org) {
 
 	mkdirSync(tmpDir, { recursive: true });
 
-	zip.extractAllTo(tmpDir, true);
+	zip.extractAllTo(tmpDir, true, true);
 
 	stream.log(`Extracted ${zipBuffer.byteLength}bytes to ${tmpDir} successfully`);
 

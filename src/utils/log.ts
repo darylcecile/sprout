@@ -24,7 +24,7 @@ export const logger = {
 
 		clack.log.message(message, { symbol: chalk.yellow('○') });
 
-		process.stdout.write('│ \n');
+		process.stdout.write(`${chalk.gray('│')} \n`);
 
 		function clearLastNLines(n: number) {
 			for (let i = 0; i < n; i++) {
@@ -35,7 +35,7 @@ export const logger = {
 
 		function log(line: string) {
 			if (!supportsReplace) {
-				process.stdout.write(`│  ${chalk.gray(line)}\n`);
+				process.stdout.write(`${chalk.gray('│')}  ${chalk.gray(line)}\n`);
 				return;
 			}
 
@@ -46,7 +46,7 @@ export const logger = {
 			const lines = outputLines.slice(-maxLines);
 
 			lines.forEach((line, index) => {
-				process.stdout.write(`┆  ${chalk.gray(line)}\n`);
+				process.stdout.write(`${chalk.gray('┆')}  ${chalk.gray(line)}\n`);
 			});
 			lastRenderedLineCount = lines.length;
 		}
@@ -58,8 +58,8 @@ export const logger = {
 			console.info = oldConsoleLogInfo;
 
 			if (!supportsReplace) {
-				process.stdout.write('│ \n');
-				process.stdout.write(`│  ${chalk.gray(endMessage)}\n`);
+				process.stdout.write(`${chalk.gray('│')} \n`);
+				process.stdout.write(`${chalk.gray('│')}  ${chalk.gray(endMessage)}\n`);
 				return;
 			}
 
@@ -69,9 +69,9 @@ export const logger = {
 
 			method(endMessage ?? message);
 
-			process.stdout.write('│ \n');
+			process.stdout.write(`${chalk.gray('│')} \n`);
 			outputLines.forEach((line, index) => {
-				process.stdout.write(`┆  ${chalk.gray(line)}\n`);
+				process.stdout.write(`${chalk.gray('┆')}  ${chalk.gray(line)}\n`);
 			});
 			// process.stdout.write('│ \n');
 		}

@@ -14,8 +14,10 @@
 		"typescript": "^5.8.3"
 	},
 	"dependencies": {
+		"@clack/prompts": "^0.10.1",
 		"adm-zip": "^0.5.16",
 		"arktype": "^2.1.19",
+		"chalk": "^5.4.1",
 		"yargs": "^17.7.2"
 	}
 }

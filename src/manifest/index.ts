@@ -44,7 +44,7 @@ export async function loadManifest(manifestPath: string): Promise<Manifest> {
 			throw new ManifestError(`Missing config in manifest: ${manifestPath}`);
 		}
 
-		if ("manifest_version" in manifest === false) {
+		if (typeof manifest.config !== "object" || !manifest.config || "manifest_version" in manifest.config === false) {
 			throw new ManifestError(`Missing manifest version in manifest: ${manifestPath}`);
 		}
 

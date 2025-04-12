@@ -1,4 +1,5 @@
-import { cpSync } from 'node:fs';
+import { copyFileSync, mkdirSync, rmSync } from 'node:fs';
+import { constants } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { basename, extname, join } from 'node:path';
 import type { Manifest } from '../manifest';
@@ -24,25 +25,30 @@ export class ShellAdapter implements IAdapter {
 			}
 		}
 
-		const backupPath = join(tmpdir(), `${Date.now()}-zshrc`);
 		// backup the original file
-		cpSync(`${process.env.HOME}/.zshrc`, backupPath);
-		ctx.set('backupPath', backupPath);
+		if (await Bun.file(`${process.env.HOME}/.zshrc`).exists()) {
+			const backupPath = join(tmpdir(), `${Date.now()}-zshrc`);
+			copyFileSync(`${process.env.HOME}/.zshrc`, backupPath, constants.COPYFILE_FICLONE);
+			ctx.set('backupPath', backupPath);
+		}
 
 		// copy it to its new location
-		cpSync(path, `${process.env.HOME}/.zshrc`, { force: true });
+		copyFileSync(path, `${process.env.HOME}/.zshrc`, constants.COPYFILE_FICLONE);
+
+		console.log('Copied file to ~/.zshrc');
 	}
 
 	async restore(ctx: AdapterContext, reason: AdapterFailureReason) {
 		// we don't check reason here as we want to restore regardless of the reason
 		const backupPath = ctx.get('backupPath');
 		if (!backupPath) {
-			console.warn('No backup path found for shell adapter');
+			console.warn('No backup path found for shell adapter. Deleting the file instead');
+			rmSync(`${process.env.HOME}/.zshrc`, { force: true });
 			return;
 		}
 
 		// restore the original file
-		cpSync(backupPath as string, `${process.env.HOME}/.zshrc`, { force: true });
+		copyFileSync(backupPath as string, `${process.env.HOME}/.zshrc`, constants.COPYFILE_FICLONE);
 	}
 
 }

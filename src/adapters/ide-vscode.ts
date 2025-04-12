@@ -1,4 +1,5 @@
-import { cpSync } from "node:fs";
+import { copyFileSync, mkdirSync, rmSync } from 'node:fs';
+import { constants, copyFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { Manifest } from "../manifest";
@@ -11,28 +12,41 @@ export class IdeVSCodeAdapter implements IAdapter {
 	}
 
 	async configure(path: string, ctx: AdapterContext, manifest?: Manifest | null) {
-		const backupPath = join(tmpdir(), `${Date.now()}-vscode`);
 		const originalPath = this.getSettingsPathByPlatform();
 
 		// backup the original file
-		cpSync(originalPath, backupPath);
-		ctx.set('backupPath', backupPath);
+		if (await Bun.file(originalPath).exists()) {
+			const backupPath = join(tmpdir(), `${Date.now()}-vscode`);
+			copyFileSync(originalPath, backupPath, constants.COPYFILE_FICLONE);
+			ctx.set('backupPath', backupPath);
+		}
+
+		// create the directory if it doesn't exist
+		const dirPath = join(originalPath, '..');
+		mkdirSync(dirPath, { recursive: true });
 
 		// copy it to its new location
-		cpSync(path, originalPath, { force: true });
+		copyFileSync(path, originalPath, constants.COPYFILE_FICLONE);
+
+		console.log(`Copied file to ${originalPath}`);
 	}
 
 	async restore(ctx: AdapterContext) {
+		const originalPath = this.getSettingsPathByPlatform();
+
 		const backupPath = ctx.get('backupPath');
 		if (!backupPath) {
-			console.warn('No backup path found for vscode adapter');
+			console.warn('No backup path found for vscode adapter. Deleting the file instead');
+			rmSync(originalPath, { force: true });
 			return;
 		}
 
-		const originalPath = this.getSettingsPathByPlatform();
-
 		// restore the original file
-		cpSync(backupPath as string, originalPath, { force: true });
+		copyFile(backupPath as string, originalPath, constants.COPYFILE_FICLONE);
+	}
+
+	async onError(ctx: AdapterContext, error: Error) {
+		console.error(`Error configuring vscode adapter: ${error.message}`);
 	}
 
 	getSettingsPathByPlatform() {

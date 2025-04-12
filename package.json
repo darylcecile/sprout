@@ -1,6 +1,6 @@
 {
 	"name": "@shrubs/sprout",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "A CLI for sharing local configs across multiple computers",
 	"module": "index.ts",
 	"type": "module",

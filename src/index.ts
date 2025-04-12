@@ -1,9 +1,12 @@
 import { outro } from '@clack/prompts';
 import { hideBin } from 'yargs/helpers';
 import yargs from 'yargs/yargs';
+import { version } from '../package.json';
 import { configCommand } from './commands/config';
 
-const argv = yargs(hideBin(process.argv));
+const argv = yargs(hideBin(process.argv))
+	.scriptName('sprout')
+	.version(version);
 
 argv.fail(() => { })
 

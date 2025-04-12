@@ -27,3 +27,10 @@ To use the `sprout` CLI, follow these steps:
 	```bash
 	sprout --help
 	```
+
+## Custom Repository
+If you want to create your own repository, you can do so by creating a new [profile repository](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/managing-your-profile-readme) in GitHub. 
+
+If you already have a **public** profile repository, simply create a `setup` folder in the root of the repo. Inside setup, you can create folders for each type of config you want to store. A `.toml` file in the root of each folder can be used to specify additional setup instructions.
+
+See https://github.com/darylcecile/darylcecile/tree/main/setup for an example of a profile repository.

@@ -59,9 +59,9 @@ export async function configCommand(argv: Argv) {
 async function loadDependencies(repo: Directory, manifest: Manifest) {
 	if (!manifest.dependency) return;
 
-	const stream = logger.openStream('Loading dependencies...');
-
 	for (const dependency of manifest.dependency) {
+		const stream = logger.openStream(`Installing ${dependency.name}...`);
+
 		if (dependency.check) {
 			stream.log(`Checking dependency: ${dependency.name}`);
 			const out = Bun.spawnSync(['bash', '-c', dependency.check], {
@@ -75,14 +75,21 @@ async function loadDependencies(repo: Directory, manifest: Manifest) {
 			}
 		}
 
-		stream.log(`Installing dependency: ${dependency.name}`);
+		const needSudo = dependency.require_elevated_access ?? false;
+
 		switch (dependency.installer) {
 			case 'brew': {
-				const proc = Bun.spawn(['brew', 'install', dependency.name], {
+				const cmd = createCommand({
+					command: ['brew', 'install', dependency.name],
+					sudo: needSudo
+				});
+
+				const proc = Bun.spawn(cmd, {
 					cwd: repo.getDirectory(),
 					env: process.env,
 					stdout: 'pipe',
-					stderr: 'pipe'
+					stderr: 'pipe',
+					stdin: 'inherit'
 				});
 
 				stream.sink(proc.stdout, proc.stderr);
@@ -102,11 +109,17 @@ async function loadDependencies(repo: Directory, manifest: Manifest) {
 					process.exit(1);
 				}
 
-				const proc = Bun.spawn(['bash', '-c', dependency.command], {
+				const cmd = createCommand({
+					command: ['bash', '-c', dependency.command],
+					sudo: !needSudo
+				});
+
+				const proc = Bun.spawn(cmd, {
 					cwd: repo.getDirectory(),
 					env: process.env,
 					stdout: 'pipe',
-					stderr: 'pipe'
+					stderr: 'pipe',
+					stdin: 'inherit'
 				});
 
 				stream.sink(proc.stdout, proc.stderr);
@@ -119,9 +132,10 @@ async function loadDependencies(repo: Directory, manifest: Manifest) {
 				break;
 			}
 		}
+
+		stream.end('Dependencies loaded', 'success');
 	}
 
-	stream.end('Dependencies loaded', 'success');
 }
 
 async function runCleanupScripts(repo: Directory, manifest: Manifest) {
@@ -181,4 +195,18 @@ async function runSetupScripts(repo: Directory, manifest: Manifest) {
 	}
 
 	stream.end('Setup scripts completed', 'success');
+}
+
+type CommandOptions = {
+	command: string[],
+	sudo?: boolean
+}
+function createCommand(options: CommandOptions) {
+	const { command, sudo } = options;
+
+	if (sudo) {
+		return ['sudo', ...command];
+	}
+
+	return command;
 }

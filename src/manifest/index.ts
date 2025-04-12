@@ -14,7 +14,8 @@ const ManifestSchema = type({
 		description: "string?",
 		installer: type.enumerated("brew", "bash"), // just brew and bash for now
 		check: "string?",
-		command: "string?"
+		command: "string?",
+		require_elevated_access: "boolean?"
 	}).array(),
 	"setup-script?": type({
 		name: "string",

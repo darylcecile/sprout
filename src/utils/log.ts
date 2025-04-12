@@ -46,7 +46,7 @@ export const logger = {
 			const lines = outputLines.slice(-maxLines);
 
 			lines.forEach((line, index) => {
-				process.stdout.write(`│  ${chalk.gray(line)}\n`);
+				process.stdout.write(`┆  ${chalk.gray(line)}\n`);
 			});
 			lastRenderedLineCount = lines.length;
 		}
@@ -71,7 +71,7 @@ export const logger = {
 
 			process.stdout.write('│ \n');
 			outputLines.forEach((line, index) => {
-				process.stdout.write(`│  ${chalk.gray(line)}\n`);
+				process.stdout.write(`┆  ${chalk.gray(line)}\n`);
 			});
 			process.stdout.write('│ \n');
 		}

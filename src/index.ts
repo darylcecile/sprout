@@ -4,6 +4,8 @@ import { configCommand } from './commands/config';
 
 const argv = yargs(hideBin(process.argv));
 
+argv.fail(() => { })
+
 argv.command({
 	command: 'config [repo]',
 	describe: 'Configure settings',

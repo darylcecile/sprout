@@ -11,8 +11,10 @@ const ManifestSchema = type({
 	},
 	"dependency?": type({
 		name: "string",
-		installer: type.enumerated("brew"), // just brew for now
+		description: "string?",
+		installer: type.enumerated("brew", "bash"), // just brew and bash for now
 		check: "string?",
+		command: "string?"
 	}).array(),
 	"setup-script?": type({
 		name: "string",

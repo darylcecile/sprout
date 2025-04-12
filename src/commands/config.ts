@@ -96,8 +96,32 @@ async function loadDependencies(repo: Directory, manifest: Manifest) {
 
 				break;
 			}
+			case 'bash': {
+				if (!dependency.command) {
+					stream.end("No command provided for bash installer", 'failure');
+					process.exit(1);
+				}
+
+				const proc = Bun.spawn(['bash', '-c', dependency.command], {
+					cwd: repo.getDirectory(),
+					env: process.env,
+					stdout: 'pipe',
+					stderr: 'pipe'
+				});
+
+				stream.sink(proc.stdout, proc.stderr);
+
+				const code = await proc.exited;
+				if (code !== 0) {
+					stream.end(`Error installing dependency: ${dependency.name}`, 'failure');
+					process.exit(code);
+				}
+				break;
+			}
 		}
 	}
+
+	stream.end('Dependencies loaded', 'success');
 }
 
 async function runCleanupScripts(repo: Directory, manifest: Manifest) {

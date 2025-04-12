@@ -108,7 +108,7 @@ export const logger = {
 			// }),
 			sink: async (out?: ReadableStream<Uint8Array<ArrayBufferLike>>, err?: ReadableStream<Uint8Array<ArrayBufferLike>>) => {
 				await Promise.all([
-					async () => {
+					(async () => {
 						if (!out) return;
 						const reader = out.getReader();
 						while (true) {
@@ -117,8 +117,8 @@ export const logger = {
 							consumeChunk(value);
 						}
 						reader.releaseLock();
-					},
-					async () => {
+					})(),
+					(async () => {
 						if (!err) return;
 						const reader = err.getReader();
 						while (true) {
@@ -127,7 +127,7 @@ export const logger = {
 							consumeChunk(value);
 						}
 						reader.releaseLock();
-					}
+					})()
 				])
 			}
 		}

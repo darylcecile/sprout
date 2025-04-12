@@ -73,7 +73,7 @@ export const logger = {
 			outputLines.forEach((line, index) => {
 				process.stdout.write(`┆  ${chalk.gray(line)}\n`);
 			});
-			process.stdout.write('│ \n');
+			// process.stdout.write('│ \n');
 		}
 
 		console.log = (...args: unknown[]) => {

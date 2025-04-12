@@ -1,3 +1,4 @@
+import { outro } from '@clack/prompts';
 import { hideBin } from 'yargs/helpers';
 import yargs from 'yargs/yargs';
 import { configCommand } from './commands/config';
@@ -26,5 +27,8 @@ argv.command({
 	handler: argv => configCommand(argv)
 });
 
-
 argv.parseAsync();
+
+process.on('beforeExit', () => {
+	outro('')
+});

@@ -76,6 +76,7 @@ async function loadDependencies(repo: Directory, manifest: Manifest) {
 		}
 
 		const needSudo = dependency.require_elevated_access ?? false;
+		const needInteractive = needSudo || (dependency.require_interactive ?? false);
 
 		switch (dependency.installer) {
 			case 'brew': {
@@ -89,7 +90,7 @@ async function loadDependencies(repo: Directory, manifest: Manifest) {
 					env: process.env,
 					stdout: 'pipe',
 					stderr: 'pipe',
-					stdin: 'inherit'
+					stdin: needInteractive ? 'inherit' : 'ignore'
 				});
 
 				stream.sink(proc.stdout, proc.stderr);
@@ -111,7 +112,7 @@ async function loadDependencies(repo: Directory, manifest: Manifest) {
 
 				const cmd = createCommand({
 					command: ['bash', '-c', dependency.command],
-					sudo: !needSudo
+					sudo: needSudo
 				});
 
 				const proc = Bun.spawn(cmd, {
@@ -119,7 +120,7 @@ async function loadDependencies(repo: Directory, manifest: Manifest) {
 					env: process.env,
 					stdout: 'pipe',
 					stderr: 'pipe',
-					stdin: 'inherit'
+					stdin: needInteractive ? 'inherit' : 'ignore'
 				});
 
 				stream.sink(proc.stdout, proc.stderr);
@@ -133,7 +134,7 @@ async function loadDependencies(repo: Directory, manifest: Manifest) {
 			}
 		}
 
-		stream.end('Dependencies loaded', 'success');
+		stream.end(`${dependency.name} installed`, 'success');
 	}
 
 }

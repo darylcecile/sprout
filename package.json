@@ -1,19 +1,19 @@
 {
 	"name": "sprout",
 	"module": "index.ts",
+	"type": "module",
 	"scripts": {
 		"build": "bun build --compile ./src/index.ts --outfile ./dist/sprout"
 	},
 	"devDependencies": {
-		"@types/bun": "^1.2.9"
+		"@types/bun": "^1.2.9",
+		"@types/adm-zip": "^0.5.7",
+		"@types/yargs": "^17.0.33"
 	},
 	"peerDependencies": {
 		"typescript": "^5.8.3"
 	},
-	"type": "module",
 	"dependencies": {
-		"@types/adm-zip": "^0.5.7",
-		"@types/yargs": "^17.0.33",
 		"adm-zip": "^0.5.16",
 		"arktype": "^2.1.19",
 		"yargs": "^17.7.2"

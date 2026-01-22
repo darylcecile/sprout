@@ -18,13 +18,16 @@ export class AgentHarnessAdapter implements IAdapter {
 		const markerIndex = normalized.lastIndexOf(marker);
 		if (markerIndex === -1) return;
 
+		const home = process.env.HOME;
+		if (!home) throw new Error('HOME environment variable is not set');
+
 		const relativePath = normalized.slice(markerIndex + marker.length);
-		const destinationPath = join(process.env.HOME as string, relativePath);
+		const destinationPath = join(home, relativePath);
 
 		// backup the original file if it exists
 		if (await Bun.file(destinationPath).exists()) {
 			const backupPath = join(tmpdir(), `${Date.now()}-agent-${relativePath.replaceAll('/', '-')}`);
-			copyFileSync(destinationPath, backupPath, constants.COPYFILE_FICLONE);
+			copyFileSync(destinationPath, backupPath);
 			ctx.set(destinationPath, backupPath);
 		}
 
@@ -33,7 +36,7 @@ export class AgentHarnessAdapter implements IAdapter {
 		mkdirSync(dirPath, { recursive: true });
 
 		// copy to destination
-		copyFileSync(path, destinationPath, constants.COPYFILE_FICLONE);
+		copyFileSync(path, destinationPath);
 
 		console.log(`Copied agent harness file to ${destinationPath}`);
 	}

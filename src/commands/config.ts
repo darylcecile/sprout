@@ -35,6 +35,7 @@ export async function configCommand(argv: Argv) {
 	const files = repo.listFiles({
 		ignore: ['.gitignore', 'README.md']
 	});
+	const directories = repo.listDirectories();
 
 	if (manifest?.["setup-script"]) await runSetupScripts(repo, manifest);
 
@@ -50,6 +51,14 @@ export async function configCommand(argv: Argv) {
 		stream.log(`Processing file: ${file.name}`);
 		await new Promise(resolve => setTimeout(resolve, 1000)); // simulate some processing time
 		await processAdapters(adapters, file.name, manifest)
+	}
+
+	// process config directories (e.g. ~/.config mirroring)
+	for (const dir of directories) {
+		if (!dir.name) continue;
+		if (dir.name.endsWith('/config') === false && dir.name.endsWith('\\config') === false) continue;
+		stream.log(`Processing directory: ${dir.name}`);
+		await processAdapters(adapters, dir.name, manifest);
 	}
 
 	stream.end('Processing completed', 'success');
@@ -219,4 +228,3 @@ function createCommand(options: CommandOptions) {
 
 	return command;
 }
-

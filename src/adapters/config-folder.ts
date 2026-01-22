@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync, readdirSync, statSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readdirSync } from 'node:fs';
 import { constants } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { Manifest } from "../manifest";
